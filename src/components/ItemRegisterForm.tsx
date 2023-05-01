@@ -1,36 +1,86 @@
-import React from "react";
+import React, {useCallback, useState} from "react";
 import { Link } from "react-router-dom";
 import styles from "../Item.module.css"
 
-function ItemRegisterForm() {
+interface Props {
+    readonly onRegister: (itemName: string, price:number, description: string, file: File) => void;
+}
+
+function ItemRegisterForm({onRegister}: Props) {
+
+    const [itemName, setItemName] = useState("");
+    const [price, setPrice] = useState(0);
+    const [description, setDescription] = useState("");
+    const [file, setFile] = useState<File>();
+
+    const handleChangeItemName = useCallback((e: React.ChangeEvent<HTMLInputElement>)=> {
+        setItemName(e.target.value);
+    }, []);
+
+    const handleChangePrice = useCallback((e:React.ChangeEvent<HTMLInputElement>)=> {
+        setPrice(parseInt(e.target.value));
+    }, [])
+
+    const handleChangeDescription = useCallback((e:React.ChangeEvent<HTMLTextAreaElement>) => {
+        setDescription(e.target.value);
+    }, [])
+
+    const handleChangeFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        if(e.target.files){
+            console.log(e.target.files[0]);
+
+            setFile(e.target.files[0]);
+        }
+    }, []);
+
+    const handleSubmit = useCallback(
+        (e)=> {
+            e.preventDefault();
+
+            if(file){
+                onRegister(itemName, price, description, file);
+            }
+        },
+        [onRegister, itemName, price, description, file]
+    )
+
+
     return (
         <div className={styles.centered}>
             <h2>상품등록</h2>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <table>
                     <tbody>
                         <tr>
                             <td>상품명</td>
                             <td>
-                                <input type="text"/>
+                                <input
+                                    type="text"
+                                    value={itemName}
+                                    onChange={handleChangeItemName}
+                                />
                             </td>
                         </tr>
                         <tr>
                             <td>상품가격</td>
                             <td>
-                                <input type="text"/> 원
+                                <input type="text" value={price} onChange={handleChangePrice}/> 원
                             </td>
                         </tr>
                         <tr>
                             <td>상품파일</td>
                             <td>
-                                <input type="file"/>
+                                <input type="file" onChange={handleChangeFile}/>
                             </td>
                         </tr>
                         <tr>
                             <td>상품설명</td>
                             <td>
-                                <textarea rows={5}></textarea>
+                                <textarea
+                                    rows={5}
+                                    value={description}
+                                    onChange={handleChangeDescription}
+                                ></textarea>
                             </td>
                         </tr>
                     </tbody>
