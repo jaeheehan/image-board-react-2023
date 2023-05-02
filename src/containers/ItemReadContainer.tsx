@@ -8,14 +8,15 @@ import {
 } from "../modules/item"
 
 import { RootState } from "../modules";
-import { RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps, withRouter } from "react-router-dom";
+import { removeItemApi } from "../lib/api";
 
 
 interface MatchParams {
     itemId: string;
 }
 
-const ItemReadContainer = ({match}: RouteComponentProps<MatchParams>)=> {
+const ItemReadContainer = ({match, history}: RouteComponentProps<MatchParams>)=> {
 
     const { itemId } = match.params;
 
@@ -26,6 +27,17 @@ const ItemReadContainer = ({match}: RouteComponentProps<MatchParams>)=> {
         isLoading: loading[FETCH_ITEM]
     }));
 
+    const onRemove = async () =>{
+        try{
+            await removeItemApi(itemId);
+
+            alert('삭제되었습니다.');
+            history.push("/");
+        }catch (e){
+            console.log(e);
+        }
+    }
+
     useEffect(()=> {
         dispatch(fetchItem(itemId))
     }, [dispatch, itemId])
@@ -34,6 +46,7 @@ const ItemReadContainer = ({match}: RouteComponentProps<MatchParams>)=> {
         itemId={itemId}
         item={item}
         isLoading={isLoading}
+        onRemove={onRemove}
     />;
 }
 
